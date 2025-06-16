@@ -81,7 +81,7 @@ pipeline {
     stage('Run Selenium Tests') {
       steps {
         sh '''
-          python tests/selenium_test.py
+          python selenium_test.py
         '''
       }
     }
