@@ -1,0 +1,7 @@
+Flask==2.3.2                     # Framework web pour ton API
+pytest==7.3.1                   # Framework de tests unitaires
+pytest-cov==4.1.0               # Pour mesurer la couverture de tests (coverage)
+requests==2.31.0                # Pour faire des requêtes HTTP dans les tests ou clients
+flake8==6.0.0                   # Analyse statique du code (style, erreurs potentielles)
+pylint==2.17.4                  # Un autre outil d'analyse de code
+

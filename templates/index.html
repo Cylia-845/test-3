@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculatrice simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
+            color: #333;
+        }
+
+        h1 {
+            color: #007acc;
+        }
+
+        form {
+            background: #fff;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 350px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007acc;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+
+        button:hover {
+            background-color: #005fa3;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 24px;
+            color: #007acc;
+        }
+
+        #error {
+            margin-top: 10px;
+            color: #d93025;
+            font-weight: bold;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+<h1>Calculatrice simple</h1>
+<form id="calcForm">
+    <label for="a">Nombre a :</label>
+    <input type="number" step="any" id="a" name="a" required />
+
+    <label for="b">Nombre b :</label>
+    <input type="number" step="any" id="b" name="b" required />
+
+    <button type="submit">Calculer la somme</button>
+</form>
+
+<div id="result"></div>
+<div id="error"></div>
+
+<script>
+    const form = document.getElementById('calcForm');
+    const resultDiv = document.getElementById('result');
+    const errorDiv = document.getElementById('error');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const a = form.a.value;
+        const b = form.b.value;
+
+        resultDiv.textContent = '';
+        errorDiv.textContent = '';
+
+        fetch(`/add?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.result !== undefined) {
+                    resultDiv.textContent = `Résultat : ${data.result}`;
+                } else if (data.error) {
+                    errorDiv.textContent = `Erreur : ${data.error}`;
+                } else {
+                    errorDiv.textContent = "Erreur inconnue";
+                }
+            })
+            .catch(err => {
+                errorDiv.textContent = `Erreur réseau : ${err.message}`;
+            });
+    });
+</script>
+</body>
+</html>
