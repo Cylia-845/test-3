@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    docker { image 'python:3.11' }
-  }
+  agent any
   
   environment {
     SONARQUBE_SCANNER_HOME = tool 'SonarScanner' // install Jenkins
