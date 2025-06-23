@@ -40,22 +40,26 @@ pipeline {
 
 
 
-        stage('SonarQube Analysis') {
-    steps {
-        withSonarQubeEnv('SonarQube') {
-            withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
-                tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                sh '''
-                    sonar-scanner \
-                        -Dsonar.projectKey=tp3-api \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://sonarqube2:9000 \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN
-                '''
+    stage('SonarQube Analysis') {
+        steps {
+            withSonarQubeEnv('SonarQube') {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                    script {
+                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh """
+                            export PATH=\$PATH:${scannerHome}/bin
+                            sonar-scanner \
+                                -Dsonar.projectKey=tp3-api \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=http://sonarqube2:9000 \
+                                -Dsonar.login=\$SONAR_AUTH_TOKEN
+                        """
+                    }
+                }
             }
         }
     }
-}
+
 
 
 
