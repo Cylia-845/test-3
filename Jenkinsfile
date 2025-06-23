@@ -1,70 +1,75 @@
 pipeline {
     agent any
 
-    tools {
-        sonarScanner 'SonarScanner'
-    }
-
     environment {
-        SONARQUBE = 'SonarQube' 
+        SONARQUBE_SERVER = 'SonarQube'   
+        DOCKER_IMAGE = 'tp3-api:latest'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                git credentialsId: 'github-creds', url: 'https://github.com/Cylia-845/TP3-Test.git'
+                checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                echo "No compilation needed, Python project."
+                dir('api') {
+                    script {
+                        sh "docker build -t $DOCKER_IMAGE ."
+                    }
+                }
             }
         }
 
-        stage('Tests') {
+        stage('Run Unit Tests') {
             steps {
-                sh 'pip install -r api/requirements.txt'
-                sh 'pytest api/tests --junitxml=report.xml'
-            }
-            post {
-                always {
-                    junit 'report.xml'
+                dir('api') {
+                    sh 'pip install -r requirements.txt'
+                    sh 'python3 -m unittest discover tests'
                 }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv("${SONARQUBE}") {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=api-python \
-                        -Dsonar.sources=api \
-                        -Dsonar.python.version=3.10 \
-                        -Dsonar.host.url=http://sonarqube2:9000
-                    '''
+                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                    dir('api') {
+                        sh '''
+                            sonar-scanner \
+                              -Dsonar.projectKey=tp3-api \
+                              -Dsonar.sources=. \
+                              -Dsonar.host.url=$SONAR_HOST_URL \
+                              -Dsonar.login=$SONAR_AUTH_TOKEN
+                        '''
+                    }
                 }
             }
         }
 
-        stage('Static Analysis (Pylint)') {
+        stage('PMD / Warnings Next Gen') {
             steps {
-                sh '''
-                    pip install pylint
-                    pylint api/ --output-format=parseable > pylint-report.txt || true
-                '''
-                recordIssues(tools: [python()])
+                recordIssues tools: [python()]
             }
         }
 
-        stage('Docker Build & Deploy') {
+        stage('Deploy API Docker Container') {
             steps {
-                sh 'docker build -t flask-api2 ./api'
-                sh 'docker stop flask-api2 || true'
-                sh 'docker rm flask-api2 || true'
-                sh 'docker run -d -p 5000:5000 --name flask-api2 flask-api2'
+                script {
+                    // Arrêter et supprimer si existe déjà
+                    sh 'docker rm -f tp3_api_container || true'
+                    // Lancer nouveau conteneur
+                    sh 'docker run -d -p 5000:5000 --name tp3_api_container tp3-api:latest'
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline terminé."
         }
     }
 }
