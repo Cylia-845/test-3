@@ -41,22 +41,22 @@ pipeline {
 
 
         stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                        dir('api') {
-                            sh '''
-                                sonar-scanner \
-                                -Dsonar.projectKey=tp3-api \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=$SONAR_HOST_URL \
-                                -Dsonar.login=$SONAR_TOKEN
-                            '''
-                        }
-                    }
-                }
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                sh '''
+                    sonar-scanner \
+                        -Dsonar.projectKey=tp3-api \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://sonarqube2:9000 \
+                        -Dsonar.login=$SONAR_AUTH_TOKEN
+                '''
             }
         }
+    }
+}
+
 
 
         stage('PMD / Warnings Next Gen') {
