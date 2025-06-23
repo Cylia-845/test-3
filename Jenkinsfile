@@ -27,7 +27,7 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 dir('api') {
-                    sh 'pip install -r requirements.txt'
+                    sh 'pip3 install -r requirements.txt'
                     sh 'python3 -m unittest discover tests'
                 }
             }
@@ -36,18 +36,21 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    dir('api') {
-                        sh '''
-                            sonar-scanner \
-                              -Dsonar.projectKey=tp3-api \
-                              -Dsonar.sources=. \
-                              -Dsonar.host.url=$SONAR_HOST_URL \
-                              -Dsonar.login=$SONAR_AUTH_TOKEN
-                        '''
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        dir('api') {
+                            sh '''
+                                sonar-scanner \
+                                -Dsonar.projectKey=tp3-api \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=$SONAR_HOST_URL \
+                                -Dsonar.login=$SONAR_TOKEN
+                            '''
+                        }
                     }
                 }
             }
         }
+
 
         stage('PMD / Warnings Next Gen') {
             steps {
