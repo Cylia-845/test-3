@@ -24,18 +24,20 @@ pipeline {
             }
         }
 
-    stage('Run Unit Tests') {
-        steps {
-            dir('api') {
-                sh '''
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install -r requirements.txt
-                    python -m unittest discover tests
-            '''
+        stage('Run Unit Tests') {
+            steps {
+                dir('api') {
+                    sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r requirements.txt
+                        python -m unittest discover tests
+                    '''
+                }
             }
         }
-    }
+
 
 
         stage('SonarQube Analysis') {
