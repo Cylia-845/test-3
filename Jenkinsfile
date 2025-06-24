@@ -41,6 +41,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
                         script {
+                            // Récupérer le chemin du SonarScanner installé dans Jenkins
                             def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                             sh """
                                 export PATH=\$PATH:${scannerHome}/bin
@@ -55,6 +56,7 @@ pipeline {
                 }
             }
         }
+
 
 
         stage('PMD / Warnings Next Gen') {
