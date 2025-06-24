@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 import time
 
 # Options pour Chrome headless
@@ -10,8 +11,11 @@ options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.binary_location = "/usr/bin/chromium"  # chemin vers Chromium
 
-# Créer le WebDriver avec le chemin vers chromedriver
-driver = webdriver.Chrome(executable_path="/usr/local/bin/chromedriver", options=options)
+# Création du service avec le chemin vers chromedriver
+service = Service("/usr/local/bin/chromedriver")
+
+# Créer le WebDriver avec service et options (ne plus utiliser executable_path)
+driver = webdriver.Chrome(service=service, options=options)
 
 try:
     driver.get("http://tp3_api_container:5000")
