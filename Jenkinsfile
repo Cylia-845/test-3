@@ -59,20 +59,17 @@ pipeline {
         }
 
         
-        stage('PMD / Warnings Next Gen') {
+        stage('Lint Python with Pylint') {
             steps {
                 sh '''
                     python3 -m venv venv_pylint
                     . venv_pylint/bin/activate
                     pip install pylint
-                    pylint api/app.py --output-format=parseable > pylint-report.txt || true
+                    pylint api/app.py || true
                 '''
-                recordIssues tools: [[
-                    $class: 'Pylint',
-                    pattern: 'pylint-report.txt'
-                ]]
             }
         }
+
 
 
 
