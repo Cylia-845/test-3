@@ -58,7 +58,7 @@ pipeline {
             }
         }
 
-
+        
         stage('PMD / Warnings Next Gen') {
             steps {
                 sh '''
@@ -67,11 +67,13 @@ pipeline {
                     pip install pylint
                     pylint api/app.py --output-format=parseable > pylint-output.txt || true
                 '''
-                recordIssues tools: [parser: 'PYLINT'], qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]]
+                recordIssues tools: [[
+                    $class: 'Pylint',
+                    pattern: 'pylint-output.txt'
+                ]]
             }
         }
 
-   
 
         stage('Deploy API Docker Container') {
             steps {
