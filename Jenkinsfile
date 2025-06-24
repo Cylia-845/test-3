@@ -62,11 +62,13 @@ pipeline {
 
         stage('PMD / Warnings Next Gen') {
             steps {
-                sh 'pylint mon_script.py > pylint-report.txt || true'
-                recordIssues tools: [pylint(pattern: 'pylint-report.txt')]
+                sh '''
+                    pip install pylint
+                    pylint api/ --output-format=parseable > pylint-output.txt || true
+                '''
+                recordIssues tools: [pylint(pattern: 'pylint-output.txt')]
             }
         }
-
 
         stage('Deploy API Docker Container') {
             steps {
