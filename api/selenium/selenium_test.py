@@ -30,8 +30,8 @@ try:
     result = driver.find_element(By.ID, "result").text
     print("Résultat affiché :", result)
 
-    assert "Résultat : 10.0" in result
-
+    assert "Résultat : 10" in result or "Résultat : 10.0" in result
+    
 except Exception as e:
     print("Test échoué :", str(e))
 

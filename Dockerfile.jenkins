@@ -2,10 +2,30 @@ FROM jenkins/jenkins:lts
 
 USER root
 
-# Installer Docker CLI
-RUN apt-get update && apt-get install -y docker.io
+# Installer dépendances de base + Docker CLI
+RUN apt-get update && apt-get install -y \
+    docker.io \
+    python3 python3-pip \
+    curl unzip gnupg2
 
-# Installer Python et pip
-RUN apt-get install -y python3 python3-pip
+# Installer Google Chrome
+RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+ && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+ && apt-get update && apt-get install -y google-chrome-stable
+
+# Télécharger et installer ChromeDriver (version compatible avec Chrome 137)
+RUN CHROME_VERSION=$(google-chrome --version | grep -oP "\d+\.\d+\.\d+") && \
+    CHROMEDRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json" \
+      | grep -A 20 "$CHROME_VERSION" \
+      | grep "linux64" \
+      | grep -oP 'https://[^"]+') && \
+    curl -sSL "$CHROMEDRIVER_VERSION" -o /tmp/chromedriver.zip && \
+    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
+    mv /usr/local/bin/chromedriver*/chromedriver /usr/local/bin/chromedriver && \
+    chmod +x /usr/local/bin/chromedriver && \
+    rm -rf /tmp/chromedriver.zip /usr/local/bin/chromedriver*
+
+# Vérification
+RUN google-chrome --version && chromedriver --version
 
 USER jenkins
