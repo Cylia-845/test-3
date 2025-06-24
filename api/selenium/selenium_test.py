@@ -14,7 +14,7 @@ options.binary_location = "/usr/bin/chromium"  # chemin vers Chromium
 driver = webdriver.Chrome(executable_path="/usr/local/bin/chromedriver", options=options)
 
 try:
-    driver.get("http://localhost:5000")  # à adapter selon l’environnement
+    driver.get("http://tp3_api_container:5000")
 
     time.sleep(1)
 
