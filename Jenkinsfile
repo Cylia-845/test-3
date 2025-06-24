@@ -26,13 +26,15 @@ pipeline {
             steps {
                 dir('api') {
                     sh '''
-                        pip install --upgrade pip
-                        pip install -r requirements.txt
-                        python -m unittest discover tests
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        ./venv/bin/pip install -r requirements.txt
+                        ./venv/bin/python -m unittest discover tests
                     '''
                 }
             }
         }
+
 
         stage('SonarQube Analysis') {
             steps {
