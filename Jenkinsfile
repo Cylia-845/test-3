@@ -36,23 +36,22 @@ pipeline {
         }
 
 
-        stage('SonarQube Analysis') {
+       stage('SonarQube Analysis') {
             steps {
-                dir('api') {
-                    withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                        script {
-                            def scannerHome = tool 'SonarScanner'
-                            sh """
-                                ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=tp3-api \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=http://sonarqube2:9000
-                            """
-                        }
+                withSonarQubeEnv('SonarQube') {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                        sh """
+                            sonar-scanner \
+                            -Dsonar.projectKey=tp3-analyse \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://sonarqube:9000 \
+                            -Dsonar.login=$SONAR_AUTH_TOKEN
+                        """
                     }
                 }
             }
         }
+
 
         stage('PMD / Warnings Next Gen') {
             steps {
