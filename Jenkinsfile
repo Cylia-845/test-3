@@ -65,14 +65,15 @@ pipeline {
                     python3 -m venv venv_pylint
                     . venv_pylint/bin/activate
                     pip install pylint
-                    pylint api/app.py --output-format=parseable > pylint-output.txt || true
+                    pylint api/app.py --output-format=checkstyle > pylint-report.xml || true
                 '''
                 recordIssues tools: [[
-                    $class: 'Pylint',
-                    pattern: 'pylint-output.txt'
+                    $class: 'CheckStyle',
+                    pattern: 'pylint-report.xml'
                 ]]
             }
         }
+
 
 
         stage('Deploy API Docker Container') {
