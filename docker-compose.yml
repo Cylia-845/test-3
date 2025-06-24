@@ -32,17 +32,7 @@ services:
       - dev-net
     restart: unless-stopped
 
-  api:
-    build: ./api  # Chemin vers le dossier contenant le Dockerfile de ton API
-    container_name: flask-api2
-    ports:
-      - "5000:5000"
-    networks:
-      - dev-net
-    restart: unless-stopped
-    depends_on:
-      - sonarqube
-
+  
 volumes:
   jenkins_home:
   sonarqube_data:

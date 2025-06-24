@@ -71,13 +71,11 @@ pipeline {
         }
 
 
-
-
         stage('Deploy API Docker Container') {
             steps {
                 sh '''
                     docker rm -f tp3_api_container || true
-                    docker run -d -p 5001:5001 --name tp3_api_container tp3-api:latest
+                    docker run -d -p 5000:5000 --name tp3_api_container tp3-api:latest
                 '''
             }
         }
