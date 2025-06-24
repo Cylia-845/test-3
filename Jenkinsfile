@@ -65,11 +65,11 @@ pipeline {
                     python3 -m venv venv_pylint
                     . venv_pylint/bin/activate
                     pip install pylint
-                    pylint api/app.py --output-format=checkstyle > pylint-report.xml || true
+                    pylint api/app.py --output-format=parseable > pylint-report.txt || true
                 '''
                 recordIssues tools: [[
-                    $class: 'CheckStyle',
-                    pattern: 'pylint-report.xml'
+                    $class: 'Pylint',
+                    pattern: 'pylint-report.txt'
                 ]]
             }
         }
@@ -80,7 +80,7 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f tp3_api_container || true
-                    docker run -d -p 5000:5000 --name tp3_api_container tp3-api:latest
+                    docker run -d -p 5001:5001 --name tp3_api_container tp3-api:latest
                 '''
             }
         }
