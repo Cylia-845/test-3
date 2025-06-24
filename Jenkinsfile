@@ -47,7 +47,7 @@ pipeline {
                                 export PATH=\$PATH:${scannerHome}/bin
                                 sonar-scanner \
                                     -Dsonar.projectKey=tp3-analyse \
-                                    -Dsonar.sources=. \
+                                    -Dsonar.sources=api \
                                     -Dsonar.exclusions=**/venv/**,**/__pycache__/** \
                                     -Dsonar.host.url=http://sonarqube:9000 \
                                     -Dsonar.login=\$SONAR_AUTH_TOKEN
@@ -62,9 +62,11 @@ pipeline {
 
         stage('PMD / Warnings Next Gen') {
             steps {
-                recordIssues tools: [python()]
+                sh 'pylint mon_script.py > pylint-report.txt || true'
+                recordIssues tools: [pylint(pattern: 'pylint-report.txt')]
             }
         }
+
 
         stage('Deploy API Docker Container') {
             steps {
