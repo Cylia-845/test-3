@@ -48,6 +48,7 @@ pipeline {
                                 sonar-scanner \
                                     -Dsonar.projectKey=tp3-analyse \
                                     -Dsonar.sources=. \
+                                    -Dsonar.exclusions=**/venv/**,**/__pycache__/** \
                                     -Dsonar.host.url=http://sonarqube:9000 \
                                     -Dsonar.login=\$SONAR_AUTH_TOKEN
                             """
