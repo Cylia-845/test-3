@@ -63,12 +63,14 @@ pipeline {
         stage('PMD / Warnings Next Gen') {
             steps {
                 sh '''
+                    python3 -m venv venv_pylint
+                    . venv_pylint/bin/activate
                     pip install pylint
                     pylint api/ --output-format=parseable > pylint-output.txt || true
                 '''
                 recordIssues tools: [pylint(pattern: 'pylint-output.txt')]
             }
-        }
+}
 
         stage('Deploy API Docker Container') {
             steps {
